@@ -28,8 +28,8 @@ def parse(url, regex, prefix):
     samples = []
     for family in text_string_to_metric_families(content):
         samples.extend(
-            Sample(prefix+name, tags, value)
-            for name, tags, value in family.samples if match(prefix+name)
+            Sample(prefix + name, tags, value)
+            for name, tags, value in family.samples if match(prefix + name)
         )
     return tuple(samples)
 

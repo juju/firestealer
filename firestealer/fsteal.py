@@ -36,7 +36,7 @@ where to store samples:
     parser.add_argument(
         '--prefix', type=str, default='',
         help='add a prefix to all sample names')
-    args =  parser.parse_args()
+    args = parser.parse_args()
     if args.target and not args.target.startswith('influxdb://'):
         parser.error('invalid target {!r}'.format(args.target))
     return args
