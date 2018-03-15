@@ -13,7 +13,7 @@ from . import exceptions
 
 
 def connect(conn_string):
-    """Return an InfluxDB client getting info from the connection string.
+    """Return an InfluxDB client connected using the given connection string.
 
     The connection string is in "$user:$passwd@$host:$port/$database" form.
     """
