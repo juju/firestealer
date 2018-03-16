@@ -12,9 +12,6 @@ from . import (
 )
 
 
-fsteal = partial(main, _fsteal)
-
-
 def main(command):
     """Set up and run the given command.
 
@@ -30,3 +27,6 @@ def main(command):
         sys.exit(1)
     except _exceptions.AppError as err:
         sys.exit(err)
+
+
+fsteal = partial(main, _fsteal)
