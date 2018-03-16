@@ -20,7 +20,7 @@ def text_to_samples(text, regex='', prefix=''):
     for family in text_string_to_metric_families(text):
         samples.extend(
             Sample(prefix + name, tags, value)
-            for name, tags, value in family.samples if match(prefix + name)
+            for name, tags, value in family.samples if match(name)
         )
     return tuple(samples)
 

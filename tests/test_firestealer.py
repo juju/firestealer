@@ -78,7 +78,7 @@ jujushell_requests_in_flight --> 0.0
         'about': 'match multiple samples with prefix',
         'args': [
             'http://4.3.2.1/metrics',
-            '-m', 'staging_process_cpu|fds',
+            '-m', 'process_cpu|fds',
             '--add-prefix', 'staging_'],
         'text': helpers.example_text,
         'want_output': """
@@ -515,7 +515,7 @@ class TestTextToSamples(TestCase):
     }, {
         'about': 'regex and prefix: specific result',
         'text': helpers.example_text,
-        'regex': 'prod_jujushell_requests_in_flight',
+        'regex': 'jujushell_requests_in_flight',
         'prefix': 'prod_',
         'want_samples': (
             firestealer.Sample(
