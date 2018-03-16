@@ -42,7 +42,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'fsteal=firestealer.cmd:fsteal_main',
+            'fsteal=firestealer:fsteal',
         ],
     },
 )

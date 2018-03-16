@@ -3,20 +3,19 @@
 
 """Main entry point for the application commands."""
 
+from functools import partial
 import sys
 
 from . import (
-    exceptions,
-    fsteal,
+    _exceptions,
+    _fsteal,
 )
 
 
-def fsteal_main():
-    """Entry point for the fsteal command."""
-    _run(fsteal)
+fsteal = partial(main, _fsteal)
 
 
-def _run(command):
+def main(command):
     """Set up and run the given command.
 
     The provided command is an object implementing the following interface:
@@ -29,5 +28,5 @@ def _run(command):
     except KeyboardInterrupt:
         print('exiting')
         sys.exit(1)
-    except exceptions.AppError as err:
+    except _exceptions.AppError as err:
         sys.exit(err)

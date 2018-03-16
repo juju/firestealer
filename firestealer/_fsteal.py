@@ -7,10 +7,12 @@ import argparse
 from collections import OrderedDict
 from functools import partial
 import json
+from urllib import request
 
 from . import (
-    influx,
-    prometheus,
+    _exceptions,
+    _influx,
+    _prometheus,
 )
 
 
@@ -37,14 +39,20 @@ where to store samples:
         '--prefix', type=str, default='',
         help='add a prefix to all sample names')
     args = parser.parse_args()
-    if args.target and not args.target.startswith('influxdb://'):
+    if args.target and not args.target.startswith(_INFLUX_SCHEMA):
         parser.error('invalid target {!r}'.format(args.target))
     return args
 
 
 def run(args):
     """Run the application with the given parsed args."""
-    samples = prometheus.parse(args.url, args.regex, args.prefix)
+    try:
+        with request.urlopen(args.url) as response:
+            text = response.read().decode('utf-8')
+    except Exception as err:
+        raise _exceptions.AppError(
+            'cannot read Prometheus endpoint: {}'.format(err))
+    samples = _prometheus.text_to_samples(text, args.regex, args.prefix)
     format_func = _format_choices[args.format]
     output = format_func(samples)
     if output:
@@ -52,8 +60,9 @@ def run(args):
     if not samples:
         return
     if args.target:
-        client = influx.connect(args.target)
-        influx.write(client, samples)
+        # The only implemented target is InfluxDB currently.
+        conn_string = args.target[len(_INFLUX_SCHEMA):]
+        _influx.write(conn_string, samples)
 
 
 _dump = partial(json.dumps, indent=4)
@@ -62,6 +71,9 @@ _dump = partial(json.dumps, indent=4)
 _format_choices = OrderedDict([
     ('json', lambda samples: _dump([s._asdict() for s in samples])),
     ('values-only', lambda samples: '\n'.join(str(s.value) for s in samples)),
-    ('points', lambda samples: _dump(influx.to_points(samples))),
+    ('points', lambda samples: _dump(_influx.samples_to_points(samples))),
     ('none', lambda _: ''),
 ])
+
+
+_INFLUX_SCHEMA = 'influxdb://'

@@ -9,17 +9,17 @@ import re
 
 from influxdb import InfluxDBClient
 
-from . import exceptions
+from . import _exceptions
 
 
-def connect(conn_string):
-    """Return an InfluxDB client connected using the given connection string.
+def write(conn_string, samples):
+    """Write the given samples to the InfluxDB at the given connection string.
 
     The connection string is in "$user:$passwd@$host:$port/$database" form.
     """
     match = _exp.match(conn_string)
     if match is None:
-        raise exceptions.AppError(
+        raise _exceptions.AppError(
             'invalid InfluxDB connection string {!r}'.format(conn_string))
     group = match.groupdict()
     info = {
@@ -29,16 +29,18 @@ def connect(conn_string):
         'port': group['port'] or 8086,
         'database': group['database'],
     }
+    points = samples_to_points(samples)
     try:
-        return InfluxDBClient(**info)
+        client = InfluxDBClient(**info)
+        client.write_points(points)
     except Exception as err:
-        raise exceptions.AppError('cannot connect to InfluxDB: {}'.format(err))
+        raise _exceptions.AppError('cannot write to InfluxDB: {}'.format(err))
 
 
-def write(client, samples):
-    """Push the given samples into the db using the given client.
+def samples_to_points(samples):
+    """Convert samples to InfluxDB points.
 
-    Only samples with an actual value are included.
+    Only samples with an actual value are included in the resulting list.
     """
     def hasvalue(sample):
         try:
@@ -46,22 +48,14 @@ def write(client, samples):
         except TypeError:
             # The value is not a number, assume it is good to go.
             return True
-    points = to_points(filter(hasvalue, samples))
-    try:
-        client.write_points(points)
-    except Exception as err:
-        raise exceptions.AppError('cannot write to InfluxDB: {}'.format(err))
 
-
-def to_points(samples):
-    """Convert samples to InfluxDB points."""
-    now = str(datetime.utcnow())
+    now = datetime.utcnow()
     return tuple({
         "measurement": sample.name,
         "tags": sample.tags,
         "time": now,
         "fields": {"value": sample.value}
-    } for sample in samples)
+    } for sample in filter(hasvalue, samples))
 
 
 # Define a regular expression for parsing connection strings.
