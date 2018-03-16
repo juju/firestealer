@@ -12,16 +12,20 @@ from . import (
 )
 
 
-def main(command):
+def main(command, args=None):
     """Set up and run the given command.
 
     The provided command is an object implementing the following interface:
-        - setup() -> args: for parsing command line arguments;
-        - run(args): for executing the command, possibly raising AppError.
+        - setup(args) -> namespace:
+          it parses the given args (which could be None) and returns the
+          resulting argparse.Namespace object;
+        - run(namespace):
+          it executes the command receiving the namespace and possibly raising
+          firestealer.AppError.
     """
-    args = command.setup()
+    namespace = command.setup(args)
     try:
-        command.run(args)
+        command.run(namespace)
     except KeyboardInterrupt:
         print('exiting')
         sys.exit(1)

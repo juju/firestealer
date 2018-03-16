@@ -16,7 +16,7 @@ from . import (
 )
 
 
-def setup():
+def setup(args):
     """Set up the argument parser."""
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -36,39 +36,58 @@ where to store samples:
         '-m', '--match', type=str, default='', dest='regex',
         help='optional regex used to filter metrics')
     parser.add_argument(
-        '--prefix', type=str, default='',
+        '--add-prefix', type=str, default='', dest='prefix',
         help='add a prefix to all sample names')
-    args = parser.parse_args()
-    if args.target and not args.target.startswith(_INFLUX_SCHEMA):
-        parser.error('invalid target {!r}'.format(args.target))
-    return args
+    ns = parser.parse_args(args)
+    if ns.target and not ns.target.startswith(_INFLUX_SCHEMA):
+        parser.error('invalid target {!r}'.format(ns.target))
+        return
+    return ns
 
 
-def run(args):
-    """Run the application with the given parsed args."""
+def run(ns):
+    """Run the application with the given parsed namespace."""
     try:
-        with request.urlopen(args.url) as response:
+        with request.urlopen(ns.url) as response:
             text = response.read().decode('utf-8')
     except Exception as err:
         raise _exceptions.AppError(
-            'cannot read Prometheus endpoint: {}'.format(err))
-    samples = _prometheus.text_to_samples(text, args.regex, args.prefix)
-    format_func = _format_choices[args.format]
+            'cannot read from Prometheus endpoint: {}'.format(err))
+    samples = _prometheus.text_to_samples(
+        text, regex=ns.regex, prefix=ns.prefix)
+    if samples and ns.target:
+        # The only implemented target is InfluxDB currently.
+        conn_string = ns.target[len(_INFLUX_SCHEMA):]
+        _influx.write(conn_string, samples)
+    format_func = _format_choices[ns.format]
     output = format_func(samples)
     if output:
         print(output)
-    if not samples:
-        return
-    if args.target:
-        # The only implemented target is InfluxDB currently.
-        conn_string = args.target[len(_INFLUX_SCHEMA):]
-        _influx.write(conn_string, samples)
+
+
+def _format_text(samples):
+    """Format samples as human readable text."""
+    families = OrderedDict()
+    for sample in samples:
+        values = families.setdefault(sample.name, OrderedDict())
+        tagitems = sorted(sample.tags.items())
+        tags = ' '.join('{}={}'.format(k, v) for k, v in tagitems)
+        values[tags] = sample.value
+    text = []
+    for family, values in families.items():
+        value = values.pop('', None)
+        if value is not None:
+            family = '{} --> {}'.format(family, value)
+        text.append(family)
+        text.extend('  {} --> {}'.format(k, v) for k, v in values.items())
+    return '\n'.join(text)
 
 
 _dump = partial(json.dumps, indent=4)
 # Define a map of format choices to format functions. A format function
 # receives a sequence of samples and returns a string.
 _format_choices = OrderedDict([
+    ('text', _format_text),
     ('json', lambda samples: _dump([s._asdict() for s in samples])),
     ('values-only', lambda samples: '\n'.join(str(s.value) for s in samples)),
     ('points', lambda samples: _dump(_influx.samples_to_points(samples))),

@@ -6,4 +6,5 @@ import unittest
 
 # Show full diff in unittest.
 # TODO(frankban): is it possible that this is the only way to do it?
-unittest.util._MAX_LENGTH = 2000
+unittest.util._MAX_LENGTH = 9000
+unittest.TestCase.maxDiff = None

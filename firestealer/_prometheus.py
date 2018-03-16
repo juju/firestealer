@@ -9,7 +9,7 @@ import re
 from prometheus_client.parser import text_string_to_metric_families
 
 
-def text_to_samples(text, regex, prefix):
+def text_to_samples(text, regex='', prefix=''):
     """Parse the given metrics text and return a sequence of samples.
 
     Only return samples whose name matches the given regex.

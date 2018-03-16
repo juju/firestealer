@@ -3,7 +3,7 @@
 
 """Handlers for connecting and executing queries in InfluxDB."""
 
-from datetime import datetime
+import datetime
 import math
 import re
 
@@ -26,7 +26,7 @@ def write(conn_string, samples):
         'username': group['username'],
         'password': group['password'],
         'host': group['ipv6host'] or group['ipv4host'],
-        'port': group['port'] or 8086,
+        'port': int(group['port'] or 8086),
         'database': group['database'],
     }
     points = samples_to_points(samples)
@@ -49,7 +49,7 @@ def samples_to_points(samples):
             # The value is not a number, assume it is good to go.
             return True
 
-    now = datetime.utcnow()
+    now = str(datetime.datetime.utcnow())
     return tuple({
         "measurement": sample.name,
         "tags": sample.tags,
