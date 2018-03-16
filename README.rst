@@ -36,4 +36,3 @@ Only print specific metrics values (useful when executing fsteal in order to
 retrieve charm metrics)::
 
     $ fsteal localhost:8000/metrics a-single-specific-key --format values-only
-    42
