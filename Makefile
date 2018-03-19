@@ -30,7 +30,7 @@ help:
 	@echo make release - create a new release and upload it to PyPI
 
 .PHONY: release
-release: dist tag
+release: dist
 	$(DEVENV)/bin/pip install twine
 	$(DEVENV)/bin/twine upload dist/*
 
