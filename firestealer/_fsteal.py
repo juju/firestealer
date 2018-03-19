@@ -7,6 +7,7 @@ import argparse
 from collections import OrderedDict
 from functools import partial
 import json
+import ssl
 from urllib import request
 
 from . import (
@@ -38,6 +39,9 @@ where to store samples:
     parser.add_argument(
         '--add-prefix', type=str, default='', dest='prefix',
         help='add a prefix to all sample names')
+    parser.add_argument(
+        '--no-verify', action='store_true', dest='noverify',
+        help='do not verify certificates when connecting to TLS endpoints')
     ns = parser.parse_args(args)
     if ns.target and not ns.target.startswith(_INFLUX_SCHEMA):
         parser.error('invalid target {!r}'.format(ns.target))
@@ -47,8 +51,13 @@ where to store samples:
 
 def run(ns):
     """Run the application with the given parsed namespace."""
+    context = None
+    if ns.noverify:
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
     try:
-        with request.urlopen(ns.url) as response:
+        with request.urlopen(ns.url, context=context) as response:
             text = response.read().decode('utf-8')
     except Exception as err:
         raise _exceptions.AppError(
