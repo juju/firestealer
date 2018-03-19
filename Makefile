@@ -40,7 +40,7 @@ sysdeps:
 
 .PHONY: tag
 tag: dev
-	echo git tag v`$(DEVENV)/bin/python setup.py --version`
+	git tag v`$(DEVENV)/bin/python setup.py --version`
 	git push --tags origin master
 
 .PHONY: test
