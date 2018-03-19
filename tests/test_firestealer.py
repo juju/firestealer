@@ -4,6 +4,7 @@
 from contextlib import contextmanager
 from io import StringIO
 import math
+import ssl
 from unittest import (
     mock,
     TestCase,
@@ -232,6 +233,14 @@ staging_process_max_fds --> 1024.0
             '--format', 'none',
             '-m', 'no such'],
         'text': helpers.example_text,
+    }, {
+        'about': 'skip TLS cert verification',
+        'args': [
+            'https://1.2.3.4/metrics',
+            '--no-verify',
+            '--format', 'none',
+            '-m', 'no such'],
+        'text': helpers.example_text,
     }]
 
     def test_success(self):
@@ -284,7 +293,16 @@ staging_process_max_fds --> 1024.0
                     with mock.patch('datetime.datetime') as mock_datetime:
                         mock_datetime.utcnow = lambda: 'right now'
                         firestealer.fsteal(args)
-        mock_urlopen.assert_called_once_with(args[0])
+        if '--no-verify' in args:
+            self.assertEqual(
+                mock_urlopen.call_count, 1, mock_urlopen.mock_calls)
+            urlopen_args, urlopen_kwargs = mock_urlopen.call_args
+            self.assertEqual(urlopen_args[0], args[0])
+            context = urlopen_kwargs['context']
+            self.assertFalse(context.check_hostname)
+            self.assertEqual(context.verify_mode, ssl.CERT_NONE)
+        else:
+            mock_urlopen.assert_called_once_with(args[0], context=None)
         self.assertEqual(mock_stdout.getvalue(), want_output)
         if want_points:
             mock_client.assert_called_once_with(**want_influx_args)
