@@ -39,8 +39,8 @@ sysdeps:
 	sudo apt install -y $(SYSDEPS)
 
 .PHONY: tag
-tag:
-	git tag v`python setup.py --version`
+tag: dev
+	echo git tag v`$(DEVENV)/bin/python setup.py --version`
 	git push --tags origin master
 
 .PHONY: test
