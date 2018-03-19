@@ -30,13 +30,18 @@ help:
 	@echo make release - create a new release and upload it to PyPI
 
 .PHONY: release
-release: dist
+release: dist tag
 	$(DEVENV)/bin/pip install twine
 	$(DEVENV)/bin/twine upload dist/*
 
 .PHONY: sysdeps
 sysdeps:
 	sudo apt install -y $(SYSDEPS)
+
+.PHONY: tag
+tag:
+	git tag v`python setup.py --version`
+	git push --tags origin master
 
 .PHONY: test
 test: dev
