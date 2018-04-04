@@ -42,7 +42,9 @@ API
 
 An API is exposed so that firestealer can be used as a library from Python
 applications. For instance, a charm could propagate metrics from Prometheus
-to Juju with the following snippet placed in the *collect-metrics* hook::
+to Juju with the following snippet placed in the
+`collect-metrics <https://jujucharms.com/docs/2.3/reference-charm-hooks#collect-metrics>`_
+hook::
 
     from firestealer import (
         add_metrics,
