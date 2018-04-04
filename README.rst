@@ -17,9 +17,9 @@ Print JSON formatted samples from a Prometehus endpoint::
 
     $ fsteal http://localhost:8000/metrics
 
-Filter metrics using a regular exception against the sample name::
+Filter metrics using a regular expression against the sample name::
 
-    $ fsteal http://localhost:8000/metrics -m '^myservice(Donwloads|Uploads)'
+    $ fsteal http://localhost:8000/metrics -m '^myservice(Downloads|Uploads)'
 
 Store samples into InfluxDB::
 
@@ -36,3 +36,23 @@ Only print specific metrics values (useful when executing fsteal in order to
 retrieve charm metrics)::
 
     $ fsteal localhost:8000/metrics a-single-specific-key --format values-only
+
+API
+---
+
+An API is exposed so that firestealer can be used as a library from Python
+applications. For instance, a charm could propagate metrics from Prometheus
+to Juju with the following snippet placed in the
+`collect-metrics <https://jujucharms.com/docs/2.3/reference-charm-hooks#collect-metrics>`_
+hook::
+
+    from firestealer import (
+        add_metrics,
+        retrieve_metrics,
+    )
+
+    url = 'https://localhost:8000/metrics'
+    with open('metrics.yaml') as f:
+        metrics = yaml.safe_load(f)
+    samples = retrieve_metrics(url, metrics, noverify=True)
+    add_metrics(samples)
