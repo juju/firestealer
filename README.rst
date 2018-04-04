@@ -36,3 +36,21 @@ Only print specific metrics values (useful when executing fsteal in order to
 retrieve charm metrics)::
 
     $ fsteal localhost:8000/metrics a-single-specific-key --format values-only
+
+API
+---
+
+An API is exposed so that firestealer can be used as a library from Python
+applications. For instance, a charm could propagate metrics from Prometheus
+to Juju with the following snippet placed in the *collect-metrics* hook::
+
+    from firestealer import (
+        add_metrics,
+        retrieve_metrics,
+    )
+
+    url = 'https://localhost:8000/metrics'
+    with open('metrics.yaml') as f:
+        metrics = yaml.safe_load(f)
+    samples = retrieve_metrics(url, metrics, noverify=True)
+    add_metrics(samples)
