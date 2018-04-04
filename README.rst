@@ -17,9 +17,9 @@ Print JSON formatted samples from a Prometehus endpoint::
 
     $ fsteal http://localhost:8000/metrics
 
-Filter metrics using a regular exception against the sample name::
+Filter metrics using a regular expression against the sample name::
 
-    $ fsteal http://localhost:8000/metrics -m '^myservice(Donwloads|Uploads)'
+    $ fsteal http://localhost:8000/metrics -m '^myservice(Downloads|Uploads)'
 
 Store samples into InfluxDB::
 

@@ -7,11 +7,9 @@ import argparse
 from collections import OrderedDict
 from functools import partial
 import json
-import ssl
-from urllib import request
 
 from . import (
-    _exceptions,
+    _charm,
     _influx,
     _prometheus,
 )
@@ -51,19 +49,8 @@ where to store samples:
 
 def run(ns):
     """Run the application with the given parsed namespace."""
-    context = None
-    if ns.noverify:
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
-    try:
-        with request.urlopen(ns.url, context=context) as response:
-            text = response.read().decode('utf-8')
-    except Exception as err:
-        raise _exceptions.AppError(
-            'cannot read from Prometheus endpoint: {}'.format(err))
-    samples = _prometheus.text_to_samples(
-        text, regex=ns.regex, prefix=ns.prefix)
+    samples = _prometheus.retrieve_samples(
+        ns.url, regex=ns.regex, prefix=ns.prefix, noverify=ns.noverify)
     if samples and ns.target:
         # The only implemented target is InfluxDB currently.
         conn_string = ns.target[len(_INFLUX_SCHEMA):]
@@ -100,6 +87,7 @@ _format_choices = OrderedDict([
     ('json', lambda samples: _dump([s._asdict() for s in samples])),
     ('values-only', lambda samples: '\n'.join(str(s.value) for s in samples)),
     ('points', lambda samples: _dump(_influx.samples_to_points(samples))),
+    ('charm', _charm.format_charm),
     ('none', lambda _: ''),
 ])
 
