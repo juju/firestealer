@@ -39,7 +39,7 @@ class TestRetrieveMetrics(TestCase):
         'metrics': {'metrics': {'errors_count': {}}},
         'want_samples': (
             firestealer.Sample(
-                name='jujushell_errors_count',
+                name='errors_count',
                 tags={'message': 'cannot authenticate user'},
                 value=5.0),
         ),
@@ -52,11 +52,11 @@ class TestRetrieveMetrics(TestCase):
         }},
         'want_samples': (
             firestealer.Sample(
-                name='jujushell_containers_in_flight',
+                name='containers_in_flight',
                 tags={},
                 value=7.0),
             firestealer.Sample(
-                name='jujushell_errors_count',
+                name='errors_count',
                 tags={'message': 'cannot authenticate user'},
                 value=5.0),
             firestealer.Sample(
