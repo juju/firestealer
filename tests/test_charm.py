@@ -36,7 +36,7 @@ class TestRetrieveMetrics(TestCase):
         'about': 'no metrics',
     }, {
         'about': 'specific metrics',
-        'metrics': {'metrics': {'jujushell_errors_count': {}}},
+        'metrics': {'metrics': {'errors_count': {}}},
         'want_samples': (
             firestealer.Sample(
                 name='jujushell_errors_count',
@@ -46,8 +46,8 @@ class TestRetrieveMetrics(TestCase):
     }, {
         'about': 'multiple metrics',
         'metrics': {'metrics': {
-            'jujushell_errors_count': {},
-            'jujushell_containers_in_flight': {},
+            'errors_count': {},
+            'containers_in_flight': {},
             'process_max_fds': {},
         }},
         'want_samples': (
@@ -66,7 +66,7 @@ class TestRetrieveMetrics(TestCase):
         ),
     }, {
         'about': 'error',
-        'metrics': {'metrics': {'jujushell_errors_count': {}}},
+        'metrics': {'metrics': {'errors_count': {}}},
         'error': 'bad wolf',
         'want_error': 'cannot read from Prometheus endpoint: bad wolf',
     }]
