@@ -30,14 +30,25 @@ def retrieve_metrics(url, metrics, noverify=False):
     Raise a firestealer.AppError if the samples cannot be retrieved.
 
     Only return samples whose name is included in the given metrics object,
-    which is a decoded metrics.yaml content.
+    which is a decoded metrics.yaml content. Samples are renamed based on the
+    metrics provided.
     If noverify is True, then do not validate URL certificates.
     """
-    names = tuple(metrics.get('metrics', {}))
+    names = tuple(sorted(metrics.get('metrics', {})))
     if not names:
         return ()
+    # Retrieve samples from Prometheus.
     regex = '|'.join(names)
-    return _prometheus.retrieve_samples(url, regex=regex, noverify=noverify)
+    samples = _prometheus.retrieve_samples(url, regex=regex, noverify=noverify)
+    # Rename samples based on the provided metrics.
+    samples, results = list(samples), []
+    Sample = _prometheus.Sample
+    for name in names:
+        for sample in samples:
+            if name in sample.name:
+                results.append(Sample(name, sample.tags, sample.value))
+                samples.remove(sample)
+    return tuple(results)
 
 
 def _metrics(samples):
