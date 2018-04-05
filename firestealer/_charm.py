@@ -36,7 +36,7 @@ def retrieve_metrics(url, metrics, noverify=False):
     names = tuple(metrics.get('metrics', {}))
     if not names:
         return ()
-    regex = '^({})$'.format('|'.join(names))
+    regex = '|'.join(names)
     return _prometheus.retrieve_samples(url, regex=regex, noverify=noverify)
 
 
