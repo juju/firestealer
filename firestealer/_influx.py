@@ -16,10 +16,12 @@ def write(conn_string, samples):
     """Write the given samples to the InfluxDB at the given connection string.
 
     The connection string is in "$user:$passwd@$host:$port/$database" form.
+    Raise a firestealer.InfluxError if the connection string is not well formed
+    or when it is not possible to communicate with InfluxDB.
     """
     match = _exp.match(conn_string)
     if match is None:
-        raise _exceptions.AppError(
+        raise _exceptions.InfluxError(
             'invalid InfluxDB connection string {!r}'.format(conn_string))
     group = match.groupdict()
     info = {
@@ -34,7 +36,8 @@ def write(conn_string, samples):
         client = InfluxDBClient(**info)
         client.write_points(points)
     except Exception as err:
-        raise _exceptions.AppError('cannot write to InfluxDB: {}'.format(err))
+        raise _exceptions.InfluxError(
+            'cannot write to InfluxDB: {}'.format(err))
 
 
 def samples_to_points(samples):

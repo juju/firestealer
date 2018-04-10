@@ -87,7 +87,7 @@ class TestRetrieveMetrics(TestCase):
         url = 'https://example.com/metrics'
         text = helpers.example_text
         with helpers.patch_urlopen(text, error=error) as mock_urlopen:
-            with helpers.maybe_raises(firestealer.AppError) as ctx:
+            with helpers.maybe_raises(firestealer.PrometheusError) as ctx:
                 got_samples = firestealer.retrieve_metrics(
                     url, metrics, noverify=noverify)
         if metrics:

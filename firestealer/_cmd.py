@@ -21,7 +21,7 @@ def main(command, args=None):
           resulting argparse.Namespace object;
         - run(namespace):
           it executes the command receiving the namespace and possibly raising
-          firestealer.AppError.
+          firestealer.FirestealerError (or subclasses).
     """
     namespace = command.setup(args)
     try:
@@ -29,7 +29,7 @@ def main(command, args=None):
     except KeyboardInterrupt:
         print('exiting')
         sys.exit(1)
-    except _exceptions.AppError as err:
+    except _exceptions.FirestealerError as err:
         sys.exit(err)
 
 

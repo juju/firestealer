@@ -25,9 +25,9 @@ def add_metrics(samples):
 
 
 def retrieve_metrics(url, metrics, noverify=False):
-    """Retrieve and return samples for the given metrics from the given URL.
+    """Retrieve samples for the given metrics from the given Prometheus URL.
 
-    Raise a firestealer.AppError if the samples cannot be retrieved.
+    Raise a firestealer.PrometheusError if the samples cannot be retrieved.
 
     Only return samples whose name is included in the given metrics object,
     which is a decoded metrics.yaml content. Samples are renamed based on the

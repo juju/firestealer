@@ -1,7 +1,6 @@
 # Copyright 2018 Canonical Ltd.
 # Licensed under the LGPLv3, see LICENCE.txt file for details.
 
-from contextlib import contextmanager
 from io import StringIO
 from unittest import (
     mock,
@@ -312,7 +311,7 @@ staging_process_max_fds --> 1024.0
 
     def success(self, args, text, want_output, want_influx_args, want_points):
         with helpers.patch_urlopen(text) as mock_urlopen:
-            with self.patch_influx() as (mock_client, mock_write):
+            with helpers.patch_influx() as (mock_client, mock_write):
                 with mock.patch('sys.stdout', new=StringIO()) as mock_stdout:
                     with mock.patch('datetime.datetime') as mock_datetime:
                         mock_datetime.utcnow = lambda: 'right now'
@@ -329,7 +328,7 @@ staging_process_max_fds --> 1024.0
 
     def failure(self, args, text, urlopen_error, influx_error, want_error):
         with helpers.patch_urlopen(text, error=urlopen_error):
-            with self.patch_influx() as (mock_client, mock_write):
+            with helpers.patch_influx() as (mock_client, mock_write):
                 if influx_error:
                     mock_write.side_effect = ValueError(influx_error)
                 with mock.patch('sys.exit') as mock_exit:
@@ -337,10 +336,3 @@ staging_process_max_fds --> 1024.0
         self.assertEqual(mock_exit.call_count, 1)
         got_error = str(mock_exit.call_args[0][0])
         self.assertEqual(got_error, want_error)
-
-    @contextmanager
-    def patch_influx(self):
-        with mock.patch('firestealer._influx.InfluxDBClient') as mock_client:
-            mock_write = mock_client().write_points
-            mock_client.reset_mock()
-            yield mock_client, mock_write
