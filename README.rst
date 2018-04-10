@@ -57,7 +57,7 @@ hook::
     samples = retrieve_metrics(url, metrics, noverify=True)
     add_metrics(samples)
 
-Similarly, to write relevant samples to IndluxDB, the following snippet can be
+Similarly, to write relevant samples to InfluxDB, the following snippet can be
 used::
 
     from firestealer import (
