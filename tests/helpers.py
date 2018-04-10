@@ -42,6 +42,15 @@ process_max_fds 1024
 """
 
 
+@contextmanager
+def patch_influx():
+    """Patch the InfluxDB client and its write_points method."""
+    with mock.patch('firestealer._influx.InfluxDBClient') as mock_client:
+        mock_write = mock_client().write_points
+        mock_client.reset_mock()
+        yield mock_client, mock_write
+
+
 def patch_urlopen(text, error=None):
     """Patch urllib.request.urlopen so that it returns the given text.
 

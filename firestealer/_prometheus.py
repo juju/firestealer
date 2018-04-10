@@ -32,7 +32,7 @@ def text_to_samples(text, regex='', prefix=''):
 def retrieve_samples(url, regex='', prefix='', noverify=False):
     """Retrieve and return samples from the given Prometheus URL.
 
-    Raise a firestealer.AppError if the samples cannot be retrieved.
+    Raise a firestealer.PrometheusError if the samples cannot be retrieved.
 
     Only return samples whose name matches the given regex.
     If a prefix is provided, include that in the resultimg sample names.
@@ -47,7 +47,7 @@ def retrieve_samples(url, regex='', prefix='', noverify=False):
         with request.urlopen(url, context=context) as response:
             text = response.read().decode('utf-8')
     except Exception as err:
-        raise _exceptions.AppError(
+        raise _exceptions.PrometheusError(
             'cannot read from Prometheus endpoint: {}'.format(err))
     return text_to_samples(text, regex=regex, prefix=prefix)
 

@@ -56,7 +56,7 @@ class TestRetrieveSamples(TestCase):
     def retrieve(self, regex, prefix, noverify, text, error, want_error):
         url = 'https://example.com/metrics'
         with helpers.patch_urlopen(text, error=error) as mock_urlopen:
-            with helpers.maybe_raises(firestealer.AppError) as ctx:
+            with helpers.maybe_raises(firestealer.PrometheusError) as ctx:
                 got_samples = firestealer.retrieve_samples(
                     url, regex=regex, prefix=prefix, noverify=noverify)
         helpers.check_urlopen(self, mock_urlopen, url, noverify=noverify)

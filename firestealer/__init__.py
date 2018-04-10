@@ -8,8 +8,15 @@ from ._charm import (
     retrieve_metrics,
 )
 from ._cmd import fsteal
-from ._exceptions import AppError
-from ._influx import samples_to_points
+from ._exceptions import (
+    FirestealerError,
+    InfluxError,
+    PrometheusError,
+)
+from ._influx import (
+    samples_to_points,
+    write as write_to_influx,
+)
 from ._prometheus import (
     Sample,
     retrieve_samples,
@@ -19,11 +26,14 @@ from ._prometheus import (
 
 __all__ = [
     'add_metrics',
-    'AppError',
+    'FirestealerError',
     'fsteal',
+    'InfluxError',
+    'PrometheusError',
     'Sample',
     'retrieve_metrics',
     'retrieve_samples',
     'samples_to_points',
     'text_to_samples',
+    'write_to_influx',
 ]

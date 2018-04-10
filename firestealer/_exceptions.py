@@ -4,5 +4,13 @@
 """Application custom exceptions."""
 
 
-class AppError(Exception):
-    """An error occurred while running the application."""
+class FirestealerError(Exception):
+    """An error occurred while running firestealer."""
+
+
+class InfluxError(FirestealerError):
+    """An error occurred while communicating with InfluxDB."""
+
+
+class PrometheusError(FirestealerError):
+    """An error occurred while communicating with Prometheus."""

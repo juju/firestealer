@@ -23,12 +23,14 @@ clean:
 
 .PHONY: help
 help:
-	@echo make dev - create the development environment
-	@echo make test - run unit tests in the development environment
-	@echo make lint - run lint in the development environment
-	@echo make check - run lint and tests on the resulting packages
-	@echo make clean - clean up the devlopment environment
-	@echo make release - create a new release and upload it to PyPI
+	@echo "make sysdeps - install system dependencies (debian packages)"
+	@echo "make dev - create the development environment"
+	@echo "make test - run unit tests in the development enviroment"
+	@echo "make lint - run lint in the development environment"
+	@echo "make check - run lint and tests on the resulting packages"
+	@echo "make clean - clean up the devlopment environment"
+	@echo "make tag - tag a new release"
+	@echo "make release - create a new release and upload it to PyPI"
 
 .PHONY: lint
 lint: dev
