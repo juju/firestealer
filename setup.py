@@ -17,7 +17,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='firestealer',
-    version='0.4.1',
+    version='0.5.0',
     description='A command line tool for parsing Prometheus metrics',
     long_description=long_description,
     url='https://github.com/juju/firestealer',
